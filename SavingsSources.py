@@ -4,4 +4,3 @@ class SavingsSources(Source):
     def __init__(self):
         self.name = "Savings"
         self.rootListbox = None
-        self.sources = {}
