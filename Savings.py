@@ -1,6 +1,6 @@
 from Source import Source
 
-class ExpenseSources(Source):
+class generalSavings(Source):
     def __init__(self):
-        self.name = "Expenses"
+        self.name = "Savings"
         self.rootListbox = None

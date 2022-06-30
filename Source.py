@@ -1,5 +1,6 @@
+import _tkinter
+import tkinter
 from tkinter import LabelFrame, Listbox, Button, Toplevel, Label, Entry, messagebox
-
 
 class Source:
     def drawRootComponent(self, root, row, col):
@@ -34,18 +35,26 @@ class Source:
         Button(addWindow, text="Add", command=lambda: self.addRecord(nameEntry.get(), amountEntry.get(), frequencyEntry.get())).grid(row=4, column=0, columnspan=2)
 
     def drawEditWindow(self):
+        try:
+            selection = self.rootListbox.get(self.rootListbox.curselection())
+        except _tkinter.TclError:
+            print("Select an Item")
+            return
+
         editWindow = Toplevel(self.root)
         Label(editWindow, text="Edit " + self.name[:-1]).grid(row=0, column=0, columnspan=2)
 
         Label(editWindow, text="Amount").grid(row=2, column=0, sticky="w")
         amountEntry = Entry(editWindow)
+        amountEntry.insert(0, self.sources[selection]["amount"])
         amountEntry.grid(row=2, column=1)
 
         Label(editWindow, text="Frequency").grid(row=3, column=0, sticky="w")
         frequencyEntry = Entry(editWindow)
+        frequencyEntry.insert(0, self.sources[selection]["frequency"])
         frequencyEntry.grid(row=3, column=1)
 
-        Button(editWindow, text="Update", command=lambda: self.addRecord(nameEntry.get(), amountEntry.get(), frequencyEntry.get())).grid(row=4, column=0, columnspan=2)
+        Button(editWindow, text="Update", command=lambda: self.editRecord(selection, amountEntry.get(), frequencyEntry.get())).grid(row=4, column=0, columnspan=2)
 
     def validateInput(self, name, amount, frequency):
         try:
@@ -65,16 +74,22 @@ class Source:
         return True
 
     def removeRecord(self):
-        return
+        selection = self.rootListbox.get(self.rootListbox.curselection())
+        self.sources.pop(selection)
+        self.updateListbox()
 
     def addRecord(self, name, amount, frequency):
         if self.validateInput(name, amount, frequency):
-            self.sources[name] = {"amount": amount, "frequency": frequency}
-            print(self.sources)
+            self.sources[name] = {"name":name, "amount": amount, "frequency": frequency}
+            self.updateListbox()
 
 
     def editRecord(self, name, amount, frequency):
         if self.validateInput(name, amount, frequency):
-            if self.sources[name]:
-                self.sources[name] = {"amount": amount, "frequency": frequency}
-                print(self.sources)
+            self.sources[name] = {"amount": amount, "frequency": frequency}
+            self.updateListbox()
+
+    def updateListbox(self):
+        self.rootListbox.delete(0, tkinter.END)
+        for key in sorted(self.sources.keys()):
+            self.rootListbox.insert(0, self.sources[key]["name"])
