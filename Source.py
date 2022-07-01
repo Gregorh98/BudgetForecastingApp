@@ -1,6 +1,10 @@
 import _tkinter
+import datetime
 import tkinter
 from tkinter import LabelFrame, Listbox, Button, Toplevel, Label, Entry, messagebox
+
+import tkcalendar as tkcalendar
+
 
 class Source:
     def drawRootComponent(self, root, row, col):
@@ -28,11 +32,11 @@ class Source:
         amountEntry = Entry(addWindow)
         amountEntry.grid(row=2, column=1)
 
-        Label(addWindow, text="Frequency").grid(row=3, column=0, sticky="w")
-        frequencyEntry = Entry(addWindow)
-        frequencyEntry.grid(row=3, column=1)
+        Label(addWindow, text="Date").grid(row=3, column=0, sticky="w")
+        dateEntry = tkcalendar.DateEntry(addWindow)
+        dateEntry.grid(row=3, column=1, sticky="WE")
 
-        Button(addWindow, text="Add", command=lambda: self.addRecord(nameEntry.get(), amountEntry.get(), frequencyEntry.get())).grid(row=4, column=0, columnspan=2)
+        Button(addWindow, text="Add", command=lambda: self.addRecord(nameEntry.get(), amountEntry.get(), str(dateEntry.get_date()))).grid(row=4, column=0, columnspan=2)
 
     def drawEditWindow(self):
         try:
@@ -49,26 +53,27 @@ class Source:
         amountEntry.insert(0, self.sources[selection]["amount"])
         amountEntry.grid(row=2, column=1)
 
-        Label(editWindow, text="Frequency").grid(row=3, column=0, sticky="w")
-        frequencyEntry = Entry(editWindow)
-        frequencyEntry.insert(0, self.sources[selection]["frequency"])
-        frequencyEntry.grid(row=3, column=1)
+        Label(editWindow, text="Date").grid(row=3, column=0, sticky="w")
+        dateEntry = tkcalendar.DateEntry(editWindow)
+        dateEntry.set_date(datetime.date.fromisoformat(self.sources[selection]["date"]))
+        dateEntry.grid(row=3, column=1, sticky="WE")
 
-        Button(editWindow, text="Update", command=lambda: self.editRecord(selection, amountEntry.get(), frequencyEntry.get())).grid(row=4, column=0, columnspan=2)
+        Button(editWindow, text="Update", command=lambda: self.editRecord(selection, amountEntry.get(), str(dateEntry.get_date()))).grid(row=4, column=0, columnspan=2)
 
-    def validateInput(self, name, amount, frequency):
-        try:
-            name        = str(name)
-            amount      = float(amount)
-            frequency   = str(frequency)
-        except:
-            return False
+    def validateInput(self, name, amount, date):
+        print(date)
+        #try:
+        name        = str(name)
+        amount      = float(amount)
+        date        = str(date)
+       # except:
+        #    return False
 
         if name == "":
             return False
         if amount <= 0:
             return False
-        if frequency == "":
+        if datetime.date.today() > datetime.date.fromisoformat(date):
             return False
 
         return True
@@ -78,15 +83,15 @@ class Source:
         self.sources.pop(selection)
         self.updateListbox()
 
-    def addRecord(self, name, amount, frequency):
-        if self.validateInput(name, amount, frequency):
-            self.sources[name] = {"name":name, "amount": amount, "frequency": frequency}
+    def addRecord(self, name, amount, date):
+        if self.validateInput(name, amount, date):
+            self.sources[name] = {"name":name, "amount": amount, "date": date}
             self.updateListbox()
 
 
-    def editRecord(self, name, amount, frequency):
-        if self.validateInput(name, amount, frequency):
-            self.sources[name] = {"name":name, "amount": amount, "frequency": frequency}
+    def editRecord(self, name, amount, date):
+        if self.validateInput(name, amount, date):
+            self.sources[name] = {"name":name, "amount": amount, "date": date}
             self.updateListbox()
 
     def updateListbox(self):

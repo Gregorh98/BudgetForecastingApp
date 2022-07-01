@@ -1,9 +1,10 @@
 import tkinter
+from os.path import exists
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 
 from Incomes import generalIncomeSources
-from Expenses import generalExpenses, budgetedSpending, committedSpending
+from Expenses import generalExpenses, budgetedSpending, plannedSpending
 from Savings import generalSavings
 import Functions
 
@@ -15,19 +16,30 @@ class HomeWindow():
         self.expenseSources     = generalExpenses()
         self.savingsSources     = generalSavings()
         self.budgetedSpending   = budgetedSpending()
-        self.committedSpending  = committedSpending()
+        self.committedSpending  = plannedSpending()
         self.categories         = [self.incomeSources, self.expenseSources, self.savingsSources, self.budgetedSpending, self.committedSpending]
 
     def draw(self):
         self.root.title(self.title)
 
+        tabsystem = ttk.Notebook(self.root)
+        dataEntryTab = Frame(tabsystem)
+        monthlyBudgetTab = Frame(tabsystem)
+
+        tabsystem.add(dataEntryTab, text='Data')
+        tabsystem.add(monthlyBudgetTab, text='Monthly Budget')
+        tabsystem.pack(expand=1, fill="both")
+
         col = 0
 
         for x in self.categories:
-            x.drawRootComponent(self.root, 0, col)
+            x.drawRootComponent(dataEntryTab, 0, col)
             col += 1
 
-        sidePanel = LabelFrame(self.root, text="Functions Panel")
+        if exists("save.json"):
+            self.load()
+
+        sidePanel = LabelFrame(dataEntryTab, text="Functions Panel")
         sidePanel.grid(row=1, column=0, columnspan=col, sticky="ew", padx=2, pady=2)
 
         Button(sidePanel, text="Calculate\nBudget", command=self.calculateBudget).grid(column=0, row=0, padx=2, pady=2)
@@ -38,8 +50,11 @@ class HomeWindow():
         self.run()
 
     def save(self):
-        confirmOverwrite = messagebox.askyesno("Overwrite Save", "A previous save has been located, do you wish to overwrite?")
-        if confirmOverwrite:
+        if exists("save.json"):
+            confirmOverwrite = messagebox.askyesno("Overwrite Save", "A previous save has been located, do you wish to overwrite?")
+            if confirmOverwrite:
+                Functions.save(self.categories)
+        else:
             Functions.save(self.categories)
 
     def load(self):

@@ -6,10 +6,10 @@ class generalExpenses(Source):
         self.saveName       = "generalExpenses"
         self.rootListbox    = None
 
-class committedSpending(Source):
+class plannedSpending(Source):
     def __init__(self):
-        self.name           = "Committed Spending"
-        self.saveName       = "committedSpending"
+        self.name           = "Planned Spending"
+        self.saveName       = "plannedSpending"
         self.rootListbox    = None
 
 class budgetedSpending(Source):
