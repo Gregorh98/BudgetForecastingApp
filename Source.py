@@ -42,7 +42,7 @@ class Source:
             return
 
         editWindow = Toplevel(self.root)
-        Label(editWindow, text="Edit " + self.name[:-1]).grid(row=0, column=0, columnspan=2)
+        Label(editWindow, text=f"Edit '{selection}'").grid(row=0, column=0, columnspan=2)
 
         Label(editWindow, text="Amount").grid(row=2, column=0, sticky="w")
         amountEntry = Entry(editWindow)
@@ -86,7 +86,7 @@ class Source:
 
     def editRecord(self, name, amount, frequency):
         if self.validateInput(name, amount, frequency):
-            self.sources[name] = {"amount": amount, "frequency": frequency}
+            self.sources[name] = {"name":name, "amount": amount, "frequency": frequency}
             self.updateListbox()
 
     def updateListbox(self):
