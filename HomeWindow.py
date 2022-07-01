@@ -16,20 +16,21 @@ class HomeWindow():
         self.savingsSources     = generalSavings()
         self.budgetedSpending   = budgetedSpending()
         self.committedSpending  = committedSpending()
+        self.categories         = [self.incomeSources, self.expenseSources, self.savingsSources, self.budgetedSpending, self.committedSpending]
 
     def draw(self):
         self.root.title(self.title)
 
         col = 0
 
-        for x in [self.incomeSources, self.expenseSources, self.savingsSources, self.budgetedSpending, self.committedSpending]:
+        for x in self.categories:
             x.drawRootComponent(self.root, 0, col)
             col += 1
 
         sidePanel = LabelFrame(self.root, text="Functions Panel")
         sidePanel.grid(row=1, column=0, columnspan=col, sticky="ew", padx=2, pady=2)
 
-        Button(sidePanel, text="Calculate\nBudget").grid(column=0, row=0, padx=2, pady=2)
+        Button(sidePanel, text="Calculate\nBudget", command=self.calculateBudget).grid(column=0, row=0, padx=2, pady=2)
 
         Button(sidePanel, text="Save", command=self.save).grid(column=1, row=0, padx=2, pady=2)
         Button(sidePanel, text="Load", command=self.load).grid(column=2, row=0, padx=2, pady=2)
@@ -39,17 +40,24 @@ class HomeWindow():
     def save(self):
         confirmOverwrite = messagebox.askyesno("Overwrite Save", "A previous save has been located, do you wish to overwrite?")
         if confirmOverwrite:
-            Functions.save(self.incomeSources.sources, self.expenseSources.sources, self.savingsSources.sources)
+            Functions.save(self.categories)
 
     def load(self):
         save = Functions.load()
-        self.incomeSources.sources = save["incomes"]
-        self.expenseSources.sources = save["expenses"]
-        self.savingsSources.sources = save["savings"]
+        for x in self.categories:
+            x.sources = save[x.saveName]
+            x.updateListbox()
 
-        self.incomeSources.updateListbox()
-        self.expenseSources.updateListbox()
-        self.savingsSources.updateListbox()
+    def calculateBudget(self):
+        incomeTotal = self.sumSource(self.incomeSources.sources)
+        expensesTotal = self.sumSource(self.expenseSources.sources)
+        print("%s - %s = %s" % (incomeTotal, expensesTotal, incomeTotal-expensesTotal))
+
+    def sumSource(self, source):
+        total = 0
+        for x in source:
+            total += float(source[x]["amount"])
+        return total
 
     def run(self):
         while True:

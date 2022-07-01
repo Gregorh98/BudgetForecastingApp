@@ -1,7 +1,9 @@
 import json
 
-def save(incomes, expenses, savings):
-    save = {"incomes":incomes, "expenses":expenses, "savings":savings}
+def save(categories):
+    save = {}
+    for x in categories:
+        save[x.saveName] = x.sources
 
     with open("save.json", "w") as f:
         json.dump(save, f)
