@@ -6,6 +6,8 @@ from tkinter import messagebox, ttk
 from Incomes import generalIncomeSources
 from Expenses import generalExpenses, budgetedSpending, plannedSpending
 from Savings import generalSavings
+from test import Test
+from Tabs import *
 import Functions
 
 class HomeWindow():
@@ -17,7 +19,8 @@ class HomeWindow():
         self.savingsSources     = generalSavings()
         self.budgetedSpending   = budgetedSpending()
         self.committedSpending  = plannedSpending()
-        self.categories         = [self.incomeSources, self.expenseSources, self.savingsSources, self.budgetedSpending, self.committedSpending]
+        self.test = Test()
+        self.categories         = [self.incomeSources, self.expenseSources, self.budgetedSpending, self.committedSpending, self.savingsSources]
 
     def draw(self):
         self.root.title(self.title)
@@ -25,27 +28,16 @@ class HomeWindow():
         tabsystem = ttk.Notebook(self.root)
         dataEntryTab = Frame(tabsystem)
         monthlyBudgetTab = Frame(tabsystem)
+        fitnessTab = Frame(tabsystem)
 
         tabsystem.add(dataEntryTab, text='Data')
         tabsystem.add(monthlyBudgetTab, text='Monthly Budget')
+        tabsystem.add(fitnessTab, text='Financial Fitness')
         tabsystem.pack(expand=1, fill="both")
 
-        col = 0
-
-        for x in self.categories:
-            x.drawRootComponent(dataEntryTab, 0, col)
-            col += 1
-
-        if exists("save.json"):
-            self.load()
-
-        sidePanel = LabelFrame(dataEntryTab, text="Functions Panel")
-        sidePanel.grid(row=1, column=0, columnspan=col, sticky="ew", padx=2, pady=2)
-
-        Button(sidePanel, text="Calculate\nBudget", command=self.calculateBudget).grid(column=0, row=0, padx=2, pady=2)
-
-        Button(sidePanel, text="Save", command=self.save).grid(column=1, row=0, padx=2, pady=2)
-        Button(sidePanel, text="Load", command=self.load).grid(column=2, row=0, padx=2, pady=2)
+        drawDataEntryTab(self, dataEntryTab)
+        drawBudgetTab(self, monthlyBudgetTab)
+        drawFitnessTab(self, fitnessTab)
 
         self.run()
 
@@ -61,7 +53,10 @@ class HomeWindow():
         save = Functions.load()
         for x in self.categories:
             x.sources = save[x.saveName]
+            #try:
             x.updateListbox()
+            #except:
+            #    pass
 
     def calculateBudget(self):
         incomeTotal = self.sumSource(self.incomeSources.sources)
@@ -72,7 +67,7 @@ class HomeWindow():
         total = 0
         for x in source:
             total += float(source[x]["amount"])
-        return total
+        return round(total, 2)
 
     def run(self):
         while True:

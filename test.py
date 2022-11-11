@@ -6,9 +6,13 @@ from tkinter import LabelFrame, Listbox, Button, Toplevel, Label, Entry, message
 import tkcalendar as tkcalendar
 
 
-class Source:
+class Test:
     def __init__(self):
         self.sources = {}
+        self.name = "TEST"
+        self.saveName = "generalSavings"
+        self.tree = None
+        self.description = "test window for treeview integration"
 
     def drawRootComponent(self, root, row, col):
         self.root = root
@@ -18,16 +22,16 @@ class Source:
 
         self.tree = ttk.Treeview(rootFrame, columns=columns, show='headings')
 
-        self.tree.column("# 1", anchor=tkinter.W, stretch=True, width=150)
+        self.tree.column("# 1", anchor=tkinter.CENTER, stretch=True, width=100)
         self.tree.heading('nameOfSource', text='Name')
 
-        self.tree.column("# 2", anchor=tkinter.E, stretch=True, width=75)
+        self.tree.column("# 2", anchor=tkinter.CENTER, stretch=True, width=100)
         self.tree.heading('amountOfSource', text='Amount')
 
-        self.tree.column("# 3", anchor=tkinter.E, stretch=False, width=75)
+        self.tree.column("# 2", anchor=tkinter.CENTER, stretch=True, width=100)
         self.tree.heading('dateOfSource', text='Date')
 
-        self.tree.grid(row=0, column=0, columnspan=3, sticky='nw')
+        self.tree.grid(row=0, column=0, columnspan=3)
 
         # add a scrollbar
         scrollbar = ttk.Scrollbar(rootFrame, orient=tkinter.VERTICAL, command=self.tree.yview)
@@ -122,7 +126,7 @@ class Source:
 
         records = []
         for key in sorted(self.sources.keys()):
-            records.append((f'{self.sources[key]["name"]}', f"{'£{:.2f}'.format(float(self.sources[key]['amount']))}", f'{self.sources[key]["date"]}'))
+            records.append((f'{self.sources[key]["name"]}', f'{self.sources[key]["amount"]}', f'{self.sources[key]["date"]}'))
 
         # add data to the treeview
         for record in records:
