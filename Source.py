@@ -58,22 +58,23 @@ class Source:
 
     def drawEditWindow(self):
         try:
-            selection = self.rootListbox.get(self.rootListbox.curselection())
+            selection = self.tree.item(self.tree.focus())["values"]
+            print(selection)
         except _tkinter.TclError:
             print("Select an Item")
             return
 
         editWindow = Toplevel(self.root)
-        Label(editWindow, text=f"Edit '{selection}'").grid(row=0, column=0, columnspan=2)
+        Label(editWindow, text=f"Edit '{selection[0]}'").grid(row=0, column=0, columnspan=2)
 
         Label(editWindow, text="Amount").grid(row=2, column=0, sticky="w")
         amountEntry = Entry(editWindow)
-        amountEntry.insert(0, self.sources[selection]["amount"])
+        amountEntry.insert(0, selection[1][1:])
         amountEntry.grid(row=2, column=1)
 
         Label(editWindow, text="Date").grid(row=3, column=0, sticky="w")
         dateEntry = tkcalendar.DateEntry(editWindow)
-        dateEntry.set_date(datetime.date.fromisoformat(self.sources[selection]["date"]))
+        dateEntry.set_date(datetime.date.fromisoformat(selection[2]))
         dateEntry.grid(row=3, column=1, sticky="WE")
 
         Button(editWindow, text="Update", command=lambda: self.editRecord(selection, amountEntry.get(), str(dateEntry.get_date()))).grid(row=4, column=0, columnspan=2)
